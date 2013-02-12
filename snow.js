@@ -31,8 +31,10 @@ function _findbutton(doc, task, button)
     var bs = table.firstChild.childNodes[1].childNodes[2].firstChild.childNodes;
     var button;
     for (var i = 0; i < bs.length; i++) {
-        if (bs[i].getAttribute('id') == button) {
-            return bs[i];
+        if (bs[i].nodeName == 'BUTTON') {
+            if (bs[i].firstChild.innerHTML == button) {
+                return bs[i];
+            }
         }
     }
 }
@@ -40,36 +42,66 @@ function _findbutton(doc, task, button)
 function save(task)
 {
     var doc = content.document;
-    _findbutton(doc, task, 'sysverb_update_and_stay').click();
+    var button = _findbutton(doc, task, 'Save');
+    if (button) {
+        button.click();
+    } else {
+        throw "Couldn't find 'Save' button";
+    }
 }
 
 function close(task)
 {
     var doc = content.document;
 
-    if (task == 'incident') {
-        // Change state to Resolved
-        _setstate(doc, task, 8);
-
-        // Set close code
-        var select = doc.getElementById(task + '.u_close_code');
-        select.selectedIndex = 1;
-        select.onchange();
-
-        // Move Additional comments into Solution if there isn't any yet
+    // Move Additional comments into Solution if there isn't any yet
+    function movesolution(doc, task)
+    {
         solution = doc.getElementById(task + '.u_solution').value;
         if (solution == '') {
             comments = doc.getElementById(task + '.comments').value;
             doc.getElementById(task + '.u_solution').value = comments;
             doc.getElementById(task + '.comments').value = '';
         }
+    }
+
+    // Set close code
+    function setclosecode(doc, task)
+    {
+        var select = doc.getElementById(task + '.u_close_code');
+        select.selectedIndex = 1;
+        select.onchange();
+    }
+
+    if (task == 'incident') {
+        // Change state to Resolved
+        _setstate(doc, task, 8);
+        setclosecode(doc, task);
+        movesolution(doc, task);
 
         // Click on Save button
-        _findbutton(doc, task, 'sysverb_update_and_stay').click();
+        var button = _findbutton(doc, task, 'Save');
+        if (button) {
+            button.click();
+        } else {
+            throw "Couldn't find 'Save' button";
+        }
     } else if (task == 'u_request_fulfillment') {
-        // Can't find 'Got to Fulfillment button by ID. Need to use label
-        // _findbutton(doc, task, 'sysverb_update_and_stay').click();
-        throw "Unimplemented yet";
+        var button;
+        button = _findbutton(doc, task, 'Go to Fulfillment');
+        if (button) {
+            button.click();
+        } else {
+            button = _findbutton(doc, task, 'Go to Resolved');
+            if (button) {
+                _setstate(doc, task, 7);
+                setclosecode(doc, task);
+                movesolution(doc, task);
+                button.click();
+            } else {
+                throw "Couldn't find any of the buttons to close the request";
+            }
+        }
     } else {
         throw "Dunno what task this is";
     }
@@ -96,7 +128,12 @@ function wait(task)
     _setstate(doc, task, 2);
 
     // Click on Save button
-    _findbutton(doc, task, 'sysverb_update_and_stay').click();
+    var button = _findbutton(doc, task, 'Save');
+    if (button) {
+        button.click();
+    } else {
+        throw "Couldn't find 'Save' button";
+    }
 }
 
 function edit(task)
