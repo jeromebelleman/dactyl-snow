@@ -97,7 +97,18 @@ function close(task)
                 _setstate(doc, task, 7);
                 setclosecode(doc, task);
                 movesolution(doc, task);
-                button.click();
+                button = _findbutton(doc, task, 'Save');
+                /* SNOW won't let you submit the form if you click 'Go to
+                 * Resolved'. But clicking Save will cause to submit the form
+                 * discarding the solution, somehow. Not sure what to do here.
+                 */
+                if (button) {
+                    // button.click();
+                    var m = "Dunno how to Save and keep msg - leave it to you"; 
+                    dactyl.echomsg(m);
+                } else {
+                    throw "Couldn't find 'Save' button";
+                }
             } else {
                 throw "Couldn't find any of the buttons to close the request";
             }
