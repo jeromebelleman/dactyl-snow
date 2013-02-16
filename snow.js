@@ -82,7 +82,9 @@ function close(task)
         // Click on Save button
         var button = _findbutton(doc, task, 'Save');
         if (button) {
-            button.click();
+            // button.click();
+            var m = "Dunno how to Save and keep msg - leave it to you"; 
+            dactyl.echomsg(m);
         } else {
             throw "Couldn't find 'Save' button";
         }
@@ -137,34 +139,29 @@ function wait(task)
 
     // Wait for user
     _setstate(doc, task, 2);
-
-    // Click on Save button
-    var button = _findbutton(doc, task, 'Save');
-    if (button) {
-        button.click();
-    } else {
-        throw "Couldn't find 'Save' button";
-    }
 }
 
 function edit(task)
 {
     var doc = content.document;
 
-    // Get caller's input
-    if (task == 'incident') {
-        var u = '';
-    } else if (task == 'u_request_fulfillment') {
-        var u = 'u_';
-    } else {
-        throw "Dunno what task this is";
-    }
-    var i = doc.getElementById('sys_display.' + task + '.' + u + 'caller_id');
-    var firstname = i.value.split(' ')[0];
+    var textarea = doc.getElementById(task + '.comments');
 
     // Greet him
-    var textarea = doc.getElementById(task + '.comments');
-    textarea.value = 'Dear ' + firstname + ',';
+    if (!textarea.value) {
+        // Get caller's input
+        if (task == 'incident') {
+            var u = '';
+        } else if (task == 'u_request_fulfillment') {
+            var u = 'u_';
+        } else {
+            throw "Dunno what task this is";
+        }
+        var i = doc.getElementById('sys_display.' + task + '.' + u + 'caller_id');
+        var firstname = i.value.split(' ')[0];
+
+        textarea.value = 'Dear ' + firstname + ',';
+    }
 
     // Start Vim and answer him
     buffer.focusElement(textarea); // JavaScript's focus() isn't enough
