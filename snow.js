@@ -62,6 +62,10 @@ function close(task)
             comments = doc.getElementById(task + '.comments').value;
             doc.getElementById(task + '.u_solution').value = comments;
             doc.getElementById(task + '.comments').value = '';
+            // Explicitly focusing/blurring the text area may be needed to have
+            // the comment be saved.
+            buffer.focusElement(textarea);
+            textarea.blur();
         }
     }
 
