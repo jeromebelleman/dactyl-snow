@@ -54,21 +54,6 @@ function close(task)
 {
     var doc = content.document;
 
-    // Move Additional comments into Solution if there isn't any yet
-    function movesolution(doc, task)
-    {
-        solution = doc.getElementById(task + '.u_solution').value;
-        if (solution == '') {
-            comments = doc.getElementById(task + '.comments').value;
-            doc.getElementById(task + '.u_solution').value = comments;
-            doc.getElementById(task + '.comments').value = '';
-            // Explicitly focusing/blurring the text area may be needed to have
-            // the comment be saved.
-            buffer.focusElement(textarea);
-            textarea.blur();
-        }
-    }
-
     // Set close code
     function setclosecode(doc, task)
     {
@@ -77,47 +62,22 @@ function close(task)
         select.onchange();
     }
 
+    textarea = doc.getElementById(task + '.comments');
+
     if (task == 'incident') {
         // Change state to Resolved
         _setstate(doc, task, 8);
         setclosecode(doc, task);
-        movesolution(doc, task);
-
-        // Click on Save button
-        var button = _findbutton(doc, task, 'Save');
-        if (button) {
-            // button.click();
-            var m = "Dunno how to Save and keep msg - leave it to you"; 
-            dactyl.echomsg(m);
-        } else {
-            throw "Couldn't find 'Save' button";
-        }
+        textarea.onchange();
     } else if (task == 'u_request_fulfillment') {
         var button;
         button = _findbutton(doc, task, 'Go to Fulfillment');
         if (button) {
             button.click();
         } else {
-            button = _findbutton(doc, task, 'Go to Resolved');
-            if (button) {
-                _setstate(doc, task, 7);
-                setclosecode(doc, task);
-                movesolution(doc, task);
-                button = _findbutton(doc, task, 'Save');
-                /* SNOW won't let you submit the form if you click 'Go to
-                 * Resolved'. But clicking Save will cause to submit the form
-                 * discarding the solution, somehow. Not sure what to do here.
-                 */
-                if (button) {
-                    // button.click();
-                    var m = "Dunno how to Save and keep msg - leave it to you"; 
-                    dactyl.echomsg(m);
-                } else {
-                    throw "Couldn't find 'Save' button";
-                }
-            } else {
-                throw "Couldn't find any of the buttons to close the request";
-            }
+            _setstate(doc, task, 7);
+            setclosecode(doc, task);
+            textarea.onchange();
         }
     } else {
         throw "Dunno what task this is";
@@ -161,7 +121,8 @@ function edit(task)
         } else {
             throw "Dunno what task this is";
         }
-        var i = doc.getElementById('sys_display.' + task + '.' + u + 'caller_id');
+        var i;
+        i = doc.getElementById('sys_display.' + task + '.' + u + 'caller_id');
         var firstname = i.value.split(' ')[0];
 
         textarea.value = 'Dear ' + firstname + ',';
@@ -170,6 +131,9 @@ function edit(task)
     // Start Vim and answer him
     buffer.focusElement(textarea); // JavaScript's focus() isn't enough
     editor.editFieldExternally();
+
+    // Nudge comment to make SNOW notice it and accept closing it if needs be
+    textarea.onchange();
 }
 
 function cursor(n)
