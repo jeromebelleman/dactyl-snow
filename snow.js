@@ -50,6 +50,17 @@ function save(task)
     }
 }
 
+function take(task)
+{
+    var doc = content.document;
+    var button = _findbutton(doc, task, 'Take in progress');
+    if (button) {
+        button.click();
+    } else {
+        throw "Couldn't find 'Take in progress' button";
+    }
+}
+
 function close(task)
 {
     var doc = content.document;
