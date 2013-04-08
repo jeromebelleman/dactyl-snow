@@ -124,16 +124,25 @@ function edit(task)
 
     // Greet him
     if (!textarea.value) {
+        // Maybe it's a GGUS ticket - try getting an external caller
+        var i;
+        i = doc.getElementById(task + '.u_external_caller');
+
         // Get caller's input
         if (task == 'incident') {
-            var u = '';
+            var u = '.';
         } else if (task == 'u_request_fulfillment') {
-            var u = 'u_';
+            var u = '.u_';
         } else {
             throw "Dunno what task this is";
         }
-        var i;
-        i = doc.getElementById('sys_display.' + task + '.' + u + 'caller_id');
+
+        // Seems that external_caller element always exists - value may not 
+        if (!i.value) {
+            i = doc.getElementById('sys_display.' + task + u + 'caller_id');
+        }
+
+        // Only first name
         var firstname = i.value.split(' ')[0];
 
         textarea.value = 'Dear ' + firstname + ',';
