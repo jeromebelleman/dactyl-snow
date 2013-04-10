@@ -137,8 +137,8 @@ function edit(task)
             throw "Dunno what task this is";
         }
 
-        // Seems that external_caller element always exists - value may not 
-        if (!i.value) {
+        // Seems that external_caller element sometimes exists - value may not 
+        if (!i || !i.value) {
             i = doc.getElementById('sys_display.' + task + u + 'caller_id');
         }
 
