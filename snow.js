@@ -1,3 +1,5 @@
+// services.console.logStringMessage()
+
 function hscroll(task, unit, number)
 {
     content.document.getElementById(task + '.form_scroll').focus();
@@ -77,7 +79,7 @@ function close(task)
 
     if (task == 'incident') {
         // Change state to Resolved
-        _setstate(doc, task, 8);
+        _setstate(doc, task, 9);
         setclosecode(doc, task);
         textarea.onchange();
     } else if (task == 'u_request_fulfillment') {
